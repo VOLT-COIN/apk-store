@@ -1,0 +1,29 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مخزن التطبيقات - حمّل تطبيقات وألعاب APK</title>
+<meta name="description" content="متجر APK لتطبيقاتنا وألعابنا. تحميل مباشر مع رقم التحقق SHA-256.">
+<style>
+:root{--bg:#0f1420;--card:#1a2234;--fg:#eef2f8;--mut:#9aa7bd;--ac:#3ddc97}
+@media(prefers-color-scheme:light){:root{--bg:#f4f6fa;--card:#fff;--fg:#141a28;--mut:#5b667a;--ac:#0a9a62}}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--fg)}
+header{padding:20px 16px;max-width:1000px;margin:auto}h1{margin:0 0 6px}p{color:var(--mut);margin:4px 0}
+.bar{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}input{flex:1;min-width:180px;padding:12px;border-radius:10px;border:1px solid #3a4560;background:var(--card);color:var(--fg);font-size:16px}
+button.t{padding:10px 14px;border-radius:10px;border:0;background:var(--card);color:var(--fg);cursor:pointer}button.t.on{background:var(--ac);color:#06210f}
+main{max-width:1000px;margin:auto;padding:0 16px 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.c{background:var(--card);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px}
+img.i{object-fit:cover;background:none}.i{width:56px;height:56px;border-radius:14px;background:var(--ac);color:#06210f;display:grid;place-items:center;font-size:26px;font-weight:700}
+.m{font-size:13px;color:var(--mut)}a.d{margin-top:auto;text-align:center;padding:11px;border-radius:10px;background:var(--ac);color:#06210f;font-weight:700;text-decoration:none}
+.demo{background:#c0392b;color:#fff;text-align:center;padding:6px;font-size:13px}a.d.off{background:#55607a;color:#ddd;pointer-events:none}code{font-size:11px;word-break:break-all}
+footer{max-width:1000px;margin:auto;padding:16px;color:var(--mut);font-size:13px}
+</style></head><body><div id="demo" class="demo" hidden>معاينة تصميم ببيانات وهمية، لا يوجد ملفات حقيقية</div>
+<header><h1>مخزن التطبيقات</h1><p>تطبيقات وألعاب أندرويد بتحميل مباشر. كل ملف معاه رقم SHA-256 للتحقق.</p>
+<div class="bar"><input id="q" placeholder="ابحث عن تطبيق أو لعبة"><button class="t on" data-c="">الكل</button><button class="t" data-c="games">ألعاب</button><button class="t" data-c="apps">تطبيقات</button></div></header>
+<main id="g"></main>
+<footer>التطبيقات هنا من تطوير أصحابها أو بإذنهم. للنشر أو للإبلاغ عن مخالفة راسلنا. قبل التثبيت فعّل "التثبيت من مصادر غير معروفة" لمتصفحك.</footer>
+<script>
+let apps=[],cat="";const g=document.getElementById("g"),q=document.getElementById("q");
+function ok(a){return /^https:\/\//.test(a.apk_url||"")&&/^[0-9a-f]{64}$/i.test(a.sha256||"")}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function draw(){const t=q.value.trim().toLowerCase();g.innerHTML=apps.filter(a=>(!cat||a.category==cat)&&(!t||(a.name+a.name_ar).toLowerCase().includes(t))).map(a=>`<div class=c>${a.icon_url?`<img class=i src="${esc(a.icon_url)}" alt="">`:`<div class=i>${esc(a.name[0])}</div>`}<b>${esc(a.name_ar)} <span class=m>${esc(a.name)}</span></b><div class=m>الإصدار ${esc(a.version)} · ${esc(a.developer)}${a.size_mb?" · "+a.size_mb+" MB":""}</div><div>${esc(a.desc_ar)}</div>${a.sha256?`<code>SHA-256: ${esc(a.sha256)}</code>`:""}${a.changelog_ar?`<div class=m>${esc(a.changelog_ar)}</div>`:""}${a.package_name?`<div class=m>${esc(a.package_name)}</div>`:""}${a.license?`<div class=m>الترخيص: ${esc(a.license)}${a.source_url?` · <a href="${esc(a.source_url)}" rel=noopener>المصدر</a>`:""}</div>`:""}<a class="d ${ok(a)?"":"off"}" href="${ok(a)?esc(a.apk_url):"#"}">${ok(a)?"تحميل APK":"قريبًا"}</a></div>`).join("")||"<p>لا نتائج</p>"}
+document.querySelectorAll("button.t").forEach(b=>b.onclick=()=>{cat=b.dataset.c;document.querySelectorAll("button.t").forEach(x=>x.classList.toggle("on",x==b));draw()});
+if(new URLSearchParams(location.search).get("catalog"))document.getElementById("demo").hidden=false;q.oninput=draw;fetch(new URLSearchParams(location.search).get("catalog")||"catalog.json",{cache:"no-cache"}).then(r=>r.json()).then(j=>{apps=j.apps;draw()});
+</script></body></html>
