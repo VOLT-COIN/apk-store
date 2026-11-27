@@ -7,7 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-const String kCatalogUrl = 'https://makhzan-apps.pages.dev/catalog.json';
+// Catalogue locations, tried in order. The raw repo file is always current,
+// the site URLs are kept as fallbacks in case GitHub raw is unreachable.
+const List<String> kCatalogUrls = <String>[
+  'https://raw.githubusercontent.com/VOLT-COIN/apk-store/main/catalog.json',
+  'https://makhzan-apps.pages.dev/catalog.json',
+  'https://volt-coin.github.io/apk-store/catalog.json',
+];
 const MethodChannel kNative = MethodChannel('makhzan/native');
 
 const Color kBg = Color(0xFF0F1420);
@@ -143,7 +149,17 @@ class CatalogRepo {
       cache = null;
     }
     try {
-      final body = await _httpGet(kCatalogUrl);
+      String body = '';
+      Object? lastError;
+      for (final url in kCatalogUrls) {
+        try {
+          body = await _httpGet(url);
+          break;
+        } catch (e) {
+          lastError = e;
+        }
+      }
+      if (body.isEmpty) throw lastError ?? Exception('مفيش اتصال بأي مصدر للكتالوج');
       final map = jsonDecode(body);
       if (map is! Map<String, dynamic>) throw Exception('صيغة الكتالوج غير صحيحة');
       final catalog = Catalog.fromJson(map);
