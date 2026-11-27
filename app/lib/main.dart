@@ -561,6 +561,8 @@ class _HomePageState extends State<HomePage> {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: <Widget>[
               SliverToBoxAdapter(child: _header(context)),
+              if (_query.trim().isEmpty && _category.isEmpty && !_loading && apps.isNotEmpty)
+                SliverToBoxAdapter(child: _featuredRail(context)),
               if (_fromCache)
                 SliverToBoxAdapter(
                   child: Container(
@@ -610,6 +612,76 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _featuredRail(BuildContext context) {
+    final all = _catalog?.apps ?? const <StoreApp>[];
+    if (all.length < 3) return const SizedBox.shrink();
+    final picks = all.take(6).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+          child: Row(
+            children: <Widget>[
+              const Text('مختار بعناية',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0x223DDC97),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text('مميز',
+                    style: TextStyle(
+                        fontSize: 11, color: kAccent, fontWeight: FontWeight.w800)),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 176,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: picks.length,
+            separatorBuilder: (BuildContext c, int i) => const SizedBox(width: 12),
+            itemBuilder: (BuildContext c, int i) {
+              final a = picks[i];
+              return GestureDetector(
+                onTap: () => _openDetail(a),
+                child: Container(
+                  width: 132,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: kCard,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: kLine),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      AppIcon(app: a, size: 56),
+                      const SizedBox(height: 10),
+                      Text(a.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
+                      const Spacer(),
+                      Text(catLabel(a.category),
+                          style: const TextStyle(fontSize: 11, color: kMut)),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 10),
+      ],
     );
   }
 
