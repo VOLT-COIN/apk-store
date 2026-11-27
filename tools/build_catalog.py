@@ -191,6 +191,9 @@ def build(index_text, prev_entries):
         if not str(p.get("package_name", "")).startswith("com.eslam"):
             continue
         p = dict(p)
+        if p.get("id") == "makhzan-store":
+            p["name"] = "NOVA"
+            p["name_ar"] = "NOVA"
         p.setdefault("summary", (p.get("desc_ar") or "")[:140])
         p.setdefault("screenshots", [])
         p.setdefault("featured", False)
@@ -223,7 +226,7 @@ def main():
     text = load_index(args.index)
     apps = build(text, prev_entries)
     doc = {
-        "store": "مخزن التطبيقات",
+        "store": "NOVA",
         "tagline": "تحميل تطبيقات وألعاب أندرويد — مجانية ومفتوحة المصدر",
         "updated": datetime.date.today().isoformat(),
         "schema_version": 2,
