@@ -113,13 +113,16 @@ jobs:
           raw = urllib.request.urlopen(
               "https://raw.githubusercontent.com/%s/main/catalog.json" % repo, timeout=120
           ).read().decode("utf-8")
-          i = raw.index('"id": "makhzan-store"')
-          j = raw.find('"id": "', i + 10)
-          if j == -1:
-              j = len(raw)
+          m = re.search(r'"id"\s*:\s*"makhzan-store"', raw)
+          if not m:
+              print("catalog has no store entry; nothing to sync")
+              sys.exit(0)
+          i = m.start()
+          n = re.search(r'"id"\s*:\s*"', raw[i + 10:])
+          j = i + 10 + n.start() if n else len(raw)
           blk = raw[i:j]
-          blk = re.sub(r'"sha256": "[^"]*"', '"sha256": "%s"' % sha, blk, count=1)
-          blk = re.sub(r'"size_mb": [0-9.]+', '"size_mb": %s' % size, blk, count=1)
+          blk = re.sub(r'"sha256"\s*:\s*"[^"]*"', '"sha256":"%s"' % sha, blk, count=1)
+          blk = re.sub(r'"size_mb"\s*:\s*[0-9.]+', '"size_mb":%s' % size, blk, count=1)
           out = raw[:i] + blk + raw[j:]
           json.loads(out)
           if out == raw:
