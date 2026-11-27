@@ -1,29 +1,215 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>مخزن التطبيقات - حمّل تطبيقات وألعاب APK</title>
-<meta name="description" content="متجر APK لتطبيقاتنا وألعابنا. تحميل مباشر مع رقم التحقق SHA-256.">
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مخزن التطبيقات — تحميل تطبيقات وألعاب أندرويد APK</title>
+<meta name="description" content="مخزن التطبيقات: تحميل مباشر لتطبيقات وألعاب أندرويد APK مع رقم تحقق SHA-256 لكل ملف. بدون إعلانات مزعجة وبدون تسجيل.">
+<meta name="theme-color" content="#0f1420">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%233ddc97'/%3E%3Cstop offset='1' stop-color='%232696ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ctext x='32' y='45' font-size='38' font-weight='900' text-anchor='middle' fill='%2306210f' font-family='Tahoma,sans-serif'%3E%D9%85%3C/text%3E%3C/svg%3E">
 <style>
-:root{--bg:#0f1420;--card:#1a2234;--fg:#eef2f8;--mut:#9aa7bd;--ac:#3ddc97}
-@media(prefers-color-scheme:light){:root{--bg:#f4f6fa;--card:#fff;--fg:#141a28;--mut:#5b667a;--ac:#0a9a62}}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--fg)}
-header{padding:20px 16px;max-width:1000px;margin:auto}h1{margin:0 0 6px}p{color:var(--mut);margin:4px 0}
-.bar{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}input{flex:1;min-width:180px;padding:12px;border-radius:10px;border:1px solid #3a4560;background:var(--card);color:var(--fg);font-size:16px}
-button.t{padding:10px 14px;border-radius:10px;border:0;background:var(--card);color:var(--fg);cursor:pointer}button.t.on{background:var(--ac);color:#06210f}
-main{max-width:1000px;margin:auto;padding:0 16px 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.c{background:var(--card);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px}
-img.i{object-fit:cover;background:none}.i{width:56px;height:56px;border-radius:14px;background:var(--ac);color:#06210f;display:grid;place-items:center;font-size:26px;font-weight:700}
-.m{font-size:13px;color:var(--mut)}a.d{margin-top:auto;text-align:center;padding:11px;border-radius:10px;background:var(--ac);color:#06210f;font-weight:700;text-decoration:none}
-.demo{background:#c0392b;color:#fff;text-align:center;padding:6px;font-size:13px}a.d.off{background:#55607a;color:#ddd;pointer-events:none}code{font-size:11px;word-break:break-all}
-footer{max-width:1000px;margin:auto;padding:16px;color:var(--mut);font-size:13px}
-</style></head><body><div id="demo" class="demo" hidden>معاينة تصميم ببيانات وهمية، لا يوجد ملفات حقيقية</div>
-<header><h1>مخزن التطبيقات</h1><p>تطبيقات وألعاب أندرويد بتحميل مباشر. كل ملف معاه رقم SHA-256 للتحقق.</p>
-<div class="bar"><input id="q" placeholder="ابحث عن تطبيق أو لعبة"><button class="t on" data-c="">الكل</button><button class="t" data-c="games">ألعاب</button><button class="t" data-c="apps">تطبيقات</button></div></header>
-<main id="g"></main>
-<footer>التطبيقات هنا من تطوير أصحابها أو بإذنهم. للنشر أو للإبلاغ عن مخالفة راسلنا. قبل التثبيت فعّل "التثبيت من مصادر غير معروفة" لمتصفحك.</footer>
+:root{--bg:#0f1420;--card:#1a2234;--fg:#eef2f8;--mut:#9aa7bd;--ac:#3ddc97;--on:#06210f;--line:#2a3550;--warn:#ffb020}
+@media(prefers-color-scheme:light){:root{--bg:#f4f6fa;--card:#fff;--fg:#141a28;--mut:#5b667a;--ac:#0a9a62;--on:#fff;--line:#e2e7f0}}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:system-ui,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1000px;margin:auto;padding:0 16px}
+header{padding:22px 0 6px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:52px;height:52px;border-radius:15px;background:linear-gradient(135deg,#3ddc97,#2696ff);display:grid;place-items:center;font-size:30px;font-weight:900;color:#06210f;line-height:1;flex:none}
+h1{margin:0;font-size:23px;letter-spacing:-.2px}
+.sub{margin:3px 0 0;color:var(--mut);font-size:13px}
+.bar{display:flex;gap:10px;margin:18px 0 8px;flex-wrap:wrap}
+.search{position:relative;flex:1;min-width:200px}
+.search input{width:100%;padding:13px 44px 13px 14px;border-radius:13px;border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:15px;font-family:inherit}
+.search input:focus{outline:2px solid color-mix(in srgb,var(--ac) 55%,transparent);border-color:transparent}
+.search svg{position:absolute;right:14px;top:50%;transform:translateY(-50%);opacity:.55}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:10px 18px;border-radius:22px;border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s}
+.chip.on{background:var(--ac);border-color:var(--ac);color:var(--on)}
+.feat{margin:14px 0 4px;border-radius:18px;padding:16px;display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 22%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--ac) 40%,var(--line))}
+.feat .txt{flex:1;min-width:0}
+.feat b{font-size:16px}
+.feat p{margin:4px 0 0;font-size:13px;color:var(--mut)}
+.feat .cta{background:var(--ac);color:var(--on);text-decoration:none;font-weight:800;padding:11px 18px;border-radius:12px;font-size:14px;white-space:nowrap}
+main{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:14px 0 8px}
+.c{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;display:flex;flex-direction:column;gap:10px}
+.c .top{display:flex;gap:12px;align-items:flex-start}
+.icon{width:58px;height:58px;border-radius:15px;flex:none;object-fit:cover;background:var(--ac);display:grid;place-items:center;font-size:26px;font-weight:900;color:var(--on);overflow:hidden}
+.icon img{width:100%;height:100%;object-fit:cover;display:block}
+.nm{font-size:16.5px;font-weight:800;margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:8px;background:color-mix(in srgb,var(--ac) 18%,transparent);color:var(--ac);border:1px solid color-mix(in srgb,var(--ac) 45%,transparent)}
+.meta{font-size:12px;color:var(--mut);margin:3px 0 0}
+.desc{font-size:13.5px;line-height:1.55;margin:0}
+.row{display:flex;gap:8px;margin-top:auto}
+.dl{flex:1;text-align:center;padding:12px;border-radius:12px;background:var(--ac);color:var(--on);font-weight:800;text-decoration:none;font-size:14.5px;border:0;cursor:pointer;font-family:inherit}
+.dl.off{background:var(--line);color:var(--mut);cursor:default;pointer-events:none}
+.more{padding:12px 14px;border-radius:12px;background:transparent;border:1px solid var(--line);color:var(--fg);font-weight:700;cursor:pointer;font-family:inherit;font-size:13px}
+.hash{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--mut);word-break:break-all;direction:ltr;text-align:right}
+.how{margin:26px 0 0;padding:20px;border-radius:18px;background:var(--card);border:1px solid var(--line)}
+.how h2{margin:0 0 12px;font-size:17px}
+.how ol{margin:0;padding-inline-start:20px;color:var(--mut);font-size:13.5px;line-height:1.9}
+.how b{color:var(--fg)}
+footer{padding:22px 0 40px;color:var(--mut);font-size:12.5px;line-height:1.7}
+.demo{background:#c0392b;color:#fff;text-align:center;padding:7px;font-size:13px}
+.empty{padding:40px 0;text-align:center;color:var(--mut)}
+.modal{position:fixed;inset:0;background:#000a;display:flex;align-items:flex-end;justify-content:center;z-index:50;padding:0}
+.modal[hidden]{display:none}
+.sheet{background:var(--card);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:20px 20px 28px;max-height:88vh;overflow:auto}
+@media(min-width:700px){.modal{align-items:center}.sheet{border-radius:22px}}
+.sheet h3{margin:0;font-size:19px}
+.stats{display:flex;gap:8px;margin:14px 0}
+.stat{flex:1;background:var(--bg);border-radius:12px;padding:9px;text-align:center}
+.stat span{display:block;font-size:11px;color:var(--mut)}
+.stat b{font-size:13px}
+.close{float:left;background:transparent;border:0;color:var(--mut);font-size:22px;cursor:pointer;line-height:1}
+</style>
+</head>
+<body>
+<div id="demo" class="demo" hidden>معاينة تصميم ببيانات تجريبية — الملفات دي مش حقيقية</div>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">م</div>
+      <div>
+        <h1>مخزن التطبيقات</h1>
+        <p class="sub" id="sub">تطبيقات وألعاب أندرويد بتحميل مباشر، وكل ملف معاه رقم تحقق SHA-256</p>
+      </div>
+    </div>
+    <div class="bar">
+      <div class="search">
+        <input id="q" type="search" placeholder="ابحث عن تطبيق أو لعبة" autocomplete="off">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </div>
+      <div class="chips">
+        <button class="chip on" data-c="">الكل</button>
+        <button class="chip" data-c="games">ألعاب</button>
+        <button class="chip" data-c="apps">تطبيقات</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="feat" id="feat" hidden>
+    <div class="logo" style="width:46px;height:46px;border-radius:13px;font-size:26px">م</div>
+    <div class="txt">
+      <b>نزّل تطبيق مخزن التطبيقات</b>
+      <p>نفس المتجر على الموبايل: تصفح، تحميل بضغطة، وتحقّق تلقائي من رقم الملف.</p>
+    </div>
+    <a class="cta" id="featLink" href="#">تحميل</a>
+  </section>
+
+  <main id="g"></main>
+
+  <section class="how">
+    <h2>إزاي تثبّت التطبيق على الموبايل؟</h2>
+    <ol>
+      <li>اضغط <b>تحميل APK</b> واستنى الملف ينزل.</li>
+      <li>لو ظهر تحذير، اضغط <b>الإعدادات</b> وفعّل <b>السماح من هذا المصدر</b> (التثبيت من مصادر غير معروفة).</li>
+      <li>افتح الملف واضغط <b>تثبيت</b>. لو عندك تطبيق المخزن، هو بيعمل الخطوات دي لوحده.</li>
+    </ol>
+  </section>
+
+  <footer>
+    كل التطبيقات هنا من تطوير أصحابها أو بإذنهم. لو صاحب حق وشاف ملف هنا مش المفروض يكون موجود، كلّمنا وهنشيله فورًا.<br>
+    بنتحقق من كل ملف برقم SHA-256 قبل النشر. بننصح دايمًا بمقارنة الرقم اللي على الصفحة باللي بيظهر عندك.
+    <div id="upd" style="margin-top:8px"></div>
+  </footer>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="sheet" id="sheet"></div>
+</div>
+
 <script>
-let apps=[],cat="";const g=document.getElementById("g"),q=document.getElementById("q");
-function ok(a){return /^https:\/\//.test(a.apk_url||"")&&/^[0-9a-f]{64}$/i.test(a.sha256||"")}
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
-function draw(){const t=q.value.trim().toLowerCase();g.innerHTML=apps.filter(a=>(!cat||a.category==cat)&&(!t||(a.name+a.name_ar).toLowerCase().includes(t))).map(a=>`<div class=c>${a.icon_url?`<img class=i src="${esc(a.icon_url)}" alt="">`:`<div class=i>${esc(a.name[0])}</div>`}<b>${esc(a.name_ar)} <span class=m>${esc(a.name)}</span></b><div class=m>الإصدار ${esc(a.version)} · ${esc(a.developer)}${a.size_mb?" · "+a.size_mb+" MB":""}</div><div>${esc(a.desc_ar)}</div>${a.sha256?`<code>SHA-256: ${esc(a.sha256)}</code>`:""}${a.changelog_ar?`<div class=m>${esc(a.changelog_ar)}</div>`:""}${a.package_name?`<div class=m>${esc(a.package_name)}</div>`:""}${a.license?`<div class=m>الترخيص: ${esc(a.license)}${a.source_url?` · <a href="${esc(a.source_url)}" rel=noopener>المصدر</a>`:""}</div>`:""}<a class="d ${ok(a)?"":"off"}" href="${ok(a)?esc(a.apk_url):"#"}">${ok(a)?"تحميل APK":"قريبًا"}</a></div>`).join("")||"<p>لا نتائج</p>"}
-document.querySelectorAll("button.t").forEach(b=>b.onclick=()=>{cat=b.dataset.c;document.querySelectorAll("button.t").forEach(x=>x.classList.toggle("on",x==b));draw()});
-if(new URLSearchParams(location.search).get("catalog"))document.getElementById("demo").hidden=false;q.oninput=draw;fetch(new URLSearchParams(location.search).get("catalog")||"catalog.json",{cache:"no-cache"}).then(r=>r.json()).then(j=>{apps=j.apps;draw()});
-</script></body></html>
+(function(){
+  var apps=[], cat='', cur=null;
+  var g=document.getElementById('g'), q=document.getElementById('q');
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function ok(a){return /^https:\/\//.test(a.apk_url||'') && /^[0-9a-f]{64}$/i.test(a.sha256||'')}
+  function size(a){return a.size_mb? (a.size_mb>=1? a.size_mb.toFixed(2)+' MB' : Math.round(a.size_mb*1024)+' KB') : ''}
+  function iconHTML(a,cls){
+    cls=cls||'icon';
+    if(a.icon_url && a.icon_url.indexOf('data:image')===0) return '<div class="'+cls+'"><img src="'+esc(a.icon_url)+'" alt=""></div>';
+    if(a.icon_url && /^https:\/\//.test(a.icon_url)) return '<div class="'+cls+'"><img src="'+esc(a.icon_url)+'" alt="" loading="lazy"></div>';
+    return '<div class="'+cls+'">'+esc((a.name_ar||a.name||'?').slice(0,1))+'</div>';
+  }
+  function card(a){
+    var meta=[];
+    if(a.version && a.version!=='unreleased') meta.push('الإصدار '+a.version);
+    if(size(a)) meta.push(size(a));
+    meta.push(a.category==='games'?'لعبة':'تطبيق');
+    var dl = ok(a)
+      ? '<a class="dl" href="'+esc(a.apk_url)+'" rel="noopener" download>تحميل APK</a>'
+      : '<span class="dl off">قريبًا</span>';
+    return '<article class="c">'
+      + '<div class="top">'+iconHTML(a)+'<div style="min-width:0;flex:1">'
+      + '<h2 class="nm">'+esc(a.name_ar||a.name)+(a.status==='released'?'<span class="badge">جديد</span>':'')+'</h2>'
+      + '<p class="meta">'+esc(meta.join(' · '))+(a.developer?' · '+esc(a.developer):'')+'</p>'
+      + '</div></div>'
+      + '<p class="desc">'+esc(a.desc_ar)+'</p>'
+      + (a.sha256? '<div class="hash">SHA-256: '+esc(a.sha256)+'</div>':'')
+      + '<div class="row">'+dl+'<button class="more" data-id="'+esc(a.id)+'">معلومات</button></div>'
+      + '</article>';
+  }
+  function draw(){
+    var t=q.value.trim().toLowerCase();
+    var list=apps.filter(function(a){
+      if(cat && a.category!==cat) return false;
+      if(!t) return true;
+      return ((a.name||'')+(a.name_ar||'')+(a.desc_ar||'')+(a.developer||'')).toLowerCase().indexOf(t)>=0;
+    });
+    g.innerHTML = list.length? list.map(card).join('') : '<div class="empty">مفيش نتائج للبحث ده</div>';
+  }
+  function sheet(a){
+    cur=a;
+    var meta=[];
+    if(a.version && a.version!=='unreleased') meta.push(['الإصدار',a.version]);
+    if(size(a)) meta.push(['الحجم',size(a)]);
+    meta.push(['النوع',a.category==='games'?'لعبة':'تطبيق']);
+    var s='<button class="close" id="x" aria-label="إغلاق">×</button>'
+      + '<div style="display:flex;gap:14px;align-items:center">'+iconHTML(a,'icon').replace('class="icon"','class="icon" style="width:72px;height:72px;border-radius:18px"')
+      + '<div style="min-width:0"><h3>'+esc(a.name_ar||a.name)+'</h3><p class="meta">'+esc(a.name||'')+(a.developer?' · '+esc(a.developer):'')+'</p></div></div>'
+      + '<div class="stats">'+meta.map(function(m){return '<div class="stat"><span>'+esc(m[0])+'</span><b>'+esc(m[1])+'</b></div>'}).join('')+'</div>'
+      + '<p class="desc">'+esc(a.desc_ar)+'</p>'
+      + (a.changelog_ar?'<p class="meta" style="margin-top:10px"><b style="color:var(--fg)">الجديد:</b> '+esc(a.changelog_ar)+'</p>':'')
+      + (a.package_name?'<p class="hash" style="margin-top:10px">اسم الحزمة: '+esc(a.package_name)+'</p>':'')
+      + (a.sha256?'<p class="hash" style="margin-top:6px">SHA-256: '+esc(a.sha256)+'</p>':'')
+      + '<div class="row" style="margin-top:16px">'
+      + (ok(a)? '<a class="dl" href="'+esc(a.apk_url)+'" rel="noopener" download>تحميل APK</a>' : '<span class="dl off">مش متاح للتحميل لسه</span>')
+      + '</div>';
+    document.getElementById('sheet').innerHTML=s;
+    document.getElementById('modal').hidden=false;
+    document.getElementById('x').onclick=closeModal;
+  }
+  function closeModal(){document.getElementById('modal').hidden=true}
+  document.getElementById('modal').addEventListener('click',function(e){if(e.target.id==='modal')closeModal()});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()});
+  g.addEventListener('click',function(e){
+    var b=e.target.closest('button.more'); if(!b) return;
+    var a=apps.filter(function(x){return x.id===b.getAttribute('data-id')})[0];
+    if(a) sheet(a);
+  });
+  document.querySelectorAll('button.chip').forEach(function(b){b.onclick=function(){
+    cat=b.getAttribute('data-c');
+    document.querySelectorAll('button.chip').forEach(function(x){x.classList.toggle('on',x===b)});
+    draw();
+  }});
+  q.addEventListener('input',draw);
+  var demo=new URLSearchParams(location.search).get('catalog');
+  if(demo) document.getElementById('demo').hidden=false;
+  fetch(demo||'catalog.json',{cache:'no-cache'}).then(function(r){return r.json()}).then(function(j){
+    apps=j.apps||[];
+    draw();
+    document.getElementById('sub').textContent=apps.length+' تطبيق ولعبة · تحميل مباشر مع رقم تحقق SHA-256';
+    if(j.updated) document.getElementById('upd').textContent='آخر تحديث للكتالوج: '+j.updated;
+    var me=apps.filter(function(a){return a.id==='makhzan-store'})[0];
+    if(me && ok(me)){document.getElementById('featLink').href=me.apk_url;document.getElementById('feat').hidden=false;}
+  }).catch(function(){
+    g.innerHTML='<div class="empty">مش قادر أجيب الكتالوج دلوقتي. جرّب تحديث الصفحة.</div>';
+  });
+})();
+</script>
+</body>
+</html>
