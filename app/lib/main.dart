@@ -20,7 +20,7 @@ const Color kBg = Color(0xFF0F1420);
 const Color kCard = Color(0xFF1A2234);
 const Color kFg = Color(0xFFEEF2F8);
 const Color kMut = Color(0xFF9AA7BD);
-const Color kAccent = Color(0xFF3DDC97);
+const Color kAccent = Color(0xFF00CDC8);
 const Color kOnAccent = Color(0xFF06210F);
 const Color kLine = Color(0xFF2A3550);
 
@@ -162,7 +162,7 @@ class Catalog {
   factory Catalog.fromJson(Map<String, dynamic> j) {
     final raw = j['apps'] is List ? (j['apps'] as List) : const <dynamic>[];
     return Catalog(
-      store: (j['store'] ?? 'مخزن التطبيقات').toString(),
+      store: (j['store'] ?? 'NOVA').toString(),
       updated: (j['updated'] ?? '').toString(),
       apps: raw
           .whereType<Map<dynamic, dynamic>>()
@@ -399,7 +399,7 @@ class MakhzanApp extends StatelessWidget {
       snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
     );
     return MaterialApp(
-      title: 'مخزن التطبيقات',
+      title: 'NOVA',
       debugShowCheckedModeBanner: false,
       theme: dark,
       locale: const Locale('ar'),
@@ -502,7 +502,7 @@ class _HomePageState extends State<HomePage> {
       builder: (c) => AlertDialog(
         title: const Text('السماح بالتثبيت'),
         content: const Text(
-            'عشان نثبّت التطبيقات، لازم تسمح لمخزن التطبيقات إنه يفتح ملفات APK. اضغط «الإعدادات» وفعّل «السماح من هذا المصدر»، وبعدين ارجع وجرّب تاني.'),
+            'عشان نثبّت التطبيقات، لازم تسمح لـ NOVA إنه يفتح ملفات APK. اضغط «الإعدادات» وفعّل «السماح من هذا المصدر»، وبعدين ارجع وجرّب تاني.'),
         actions: <Widget>[
           TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('إلغاء')),
           FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('الإعدادات')),
@@ -702,7 +702,7 @@ class _HomePageState extends State<HomePage> {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 alignment: Alignment.center,
-                child: const Text('م',
+                child: const Text('N',
                     style: TextStyle(
                         color: kOnAccent, fontSize: 26, fontWeight: FontWeight.w900, height: 1.1)),
               ),
@@ -711,7 +711,7 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const Text('مخزن التطبيقات',
+                    const Text('NOVA',
                         style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
                     Text(
                       total > 0 ? '$total تطبيق ولعبة · تحميل مباشر مع رقم تحقق SHA-256' : 'تحميل مباشر مع رقم تحقق SHA-256',
