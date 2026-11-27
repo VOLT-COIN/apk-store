@@ -38,6 +38,10 @@ class StoreApp {
   final String version;
   final String developer;
   final String descAr;
+  final String summary;
+  final String desc;
+  final int? minSdk;
+  final String updatedAt;
   final String apkUrl;
   final String sha256;
   final String status;
@@ -57,6 +61,10 @@ class StoreApp {
     required this.version,
     required this.developer,
     required this.descAr,
+    this.summary = '',
+    this.desc = '',
+    this.minSdk,
+    this.updatedAt = '',
     required this.apkUrl,
     required this.sha256,
     required this.status,
@@ -79,6 +87,10 @@ class StoreApp {
       version: s('version'),
       developer: s('developer'),
       descAr: s('desc_ar'),
+      summary: s('summary'),
+      desc: s('desc'),
+      minSdk: j['min_sdk'] is num ? (j['min_sdk'] as num).toInt() : null,
+      updatedAt: s('updated'),
       apkUrl: s('apk_url'),
       sha256: s('sha256'),
       status: s('status'),
@@ -97,7 +109,18 @@ class StoreApp {
     );
   }
 
-  String get displayName => nameAr.isNotEmpty ? nameAr : name;
+  String get displayName =>
+      nameAr.isNotEmpty ? nameAr : (name.isNotEmpty ? name : id);
+
+  /// Short line shown on cards.
+  String get blurb => summary.isNotEmpty
+      ? summary
+      : (descAr.isNotEmpty ? descAr : desc);
+
+  /// Full text shown on the detail sheet.
+  String get description => descAr.isNotEmpty
+      ? descAr
+      : (desc.isNotEmpty ? desc : summary);
 
   bool get isGame => category == 'games';
 
@@ -106,12 +129,35 @@ class StoreApp {
       RegExp(r'^[0-9a-fA-F]{64}$').hasMatch(sha256);
 }
 
+class Cat {
+  final String id;
+  final String name;
+  const Cat(this.id, this.name);
+}
+
+/// Category id -> Arabic label, filled from the catalog on load.
+final Map<String, String> kCatNames = <String, String>{};
+
+String catLabel(String id) {
+  final n = kCatNames[id];
+  if (n != null && n.isNotEmpty) return n;
+  if (id == 'games') return 'لعبة';
+  if (id == 'apps') return 'تطبيق';
+  return 'تطبيق';
+}
+
 class Catalog {
   final String store;
   final String updated;
   final List<StoreApp> apps;
+  final List<Cat> categories;
 
-  Catalog({required this.store, required this.updated, required this.apps});
+  Catalog({
+    required this.store,
+    required this.updated,
+    required this.apps,
+    this.categories = const <Cat>[],
+  });
 
   factory Catalog.fromJson(Map<String, dynamic> j) {
     final raw = j['apps'] is List ? (j['apps'] as List) : const <dynamic>[];
@@ -121,6 +167,14 @@ class Catalog {
       apps: raw
           .whereType<Map<dynamic, dynamic>>()
           .map((e) => StoreApp.fromJson(Map<String, dynamic>.from(e)))
+          .toList(),
+      categories: (j['categories'] is List ? j['categories'] as List : const <dynamic>[])
+          .whereType<Map<dynamic, dynamic>>()
+          .map((e) => Cat(
+                (e['id'] ?? '').toString(),
+                (e['name'] ?? '').toString(),
+              ))
+          .where((c) => c.id.isNotEmpty && c.name.isNotEmpty)
           .toList(),
     );
   }
@@ -393,9 +447,15 @@ class _HomePageState extends State<HomePage> {
     });
     final r = await CatalogRepo.fetch();
     if (!mounted) return;
+    final cat = r.catalog;
+    if (cat != null) {
+      kCatNames
+        ..clear()
+        ..addEntries(cat.categories.map((c) => MapEntry(c.id, c.name)));
+    }
     setState(() {
       _loading = false;
-      _catalog = r.catalog;
+      _catalog = cat;
       _fromCache = r.fromCache;
       _error = r.error;
     });
@@ -422,7 +482,9 @@ class _HomePageState extends State<HomePage> {
     return apps.where((a) {
       if (_category.isNotEmpty && a.category != _category) return false;
       if (q.isEmpty) return true;
-      final hay = '${a.name} ${a.nameAr} ${a.descAr} ${a.developer}'.toLowerCase();
+      final hay =
+          '${a.name} ${a.nameAr} ${a.descAr} ${a.summary} ${a.desc} ${a.developer}'
+              .toLowerCase();
       return hay.contains(q);
     }).toList();
   }
@@ -618,8 +680,8 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               children: <Widget>[
                 _chip('الكل', ''),
-                _chip('ألعاب', 'games'),
-                _chip('تطبيقات', 'apps'),
+                ...(_catalog?.categories ?? const <Cat>[])
+                    .map((c) => _chip(c.name, c.id)),
               ],
             ),
           ),
@@ -793,12 +855,12 @@ class _AppCard extends StatelessWidget {
                           <String>[
                             if (app.version.isNotEmpty) 'الإصدار ${app.version}',
                             if (app.sizeMb != null) _sizeLabel(app.sizeMb),
-                            if (app.isGame) 'لعبة' else if (app.category.isNotEmpty) 'تطبيق',
+                            if (app.category.isNotEmpty) catLabel(app.category),
                           ].join(' · '),
                           style: const TextStyle(fontSize: 12, color: kMut),
                         ),
                         const SizedBox(height: 6),
-                        Text(app.descAr,
+                        Text(app.blurb,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(fontSize: 13, height: 1.45)),
@@ -970,11 +1032,11 @@ class _DetailSheet extends StatelessWidget {
             children: <Widget>[
               _stat('الإصدار', app.version.isEmpty ? '—' : app.version),
               _stat('الحجم', app.sizeMb == null ? '—' : _sizeLabel(app.sizeMb)),
-              _stat('النوع', app.isGame ? 'لعبة' : 'تطبيق'),
+              _stat('النوع', catLabel(app.category)),
             ],
           ),
           const SizedBox(height: 18),
-          Text(app.descAr, style: const TextStyle(fontSize: 14, height: 1.6)),
+          Text(app.description, style: const TextStyle(fontSize: 14, height: 1.6)),
           if (app.changelogAr.isNotEmpty) ...<Widget>[
             const SizedBox(height: 16),
             const Text('الجديد', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800)),
@@ -1008,6 +1070,20 @@ class _DetailSheet extends StatelessWidget {
             const SizedBox(height: 12),
             Text('الترخيص: ${app.license}',
                 style: const TextStyle(fontSize: 12, color: kMut)),
+          ],
+          if (app.updatedAt.isNotEmpty || app.minSdk != null) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              <String>[
+                if (app.updatedAt.isNotEmpty) 'آخر تحديث: ${app.updatedAt}',
+                if (app.minSdk != null) 'أقل إصدار أندرويد: ${app.minSdk}',
+              ].join(' · '),
+              style: const TextStyle(fontSize: 12, color: kMut),
+            ),
+          ],
+          if (app.sourceUrl.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 8),
+            _copyRow(context, 'الكود المصدري', app.sourceUrl),
           ],
           const SizedBox(height: 22),
           SizedBox(
