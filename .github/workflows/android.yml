@@ -94,35 +94,49 @@ jobs:
           APK="out/MakhzanStore-${VERSION}-arm64-v8a.apk"
           SHA=$(sha256sum "$APK" | awk '{print $1}')
           SIZE=$(python3 -c "import os,sys;print(round(os.path.getsize(sys.argv[1])/1048576,2))" "$APK")
-          # take the newest catalog, so a parallel catalog rebuild is not clobbered
-          git fetch --depth=1 origin main
-          git checkout origin/main -- catalog.json
           python3 - "$SHA" "$SIZE" <<'PYEOF'
-          import json, re, sys
+          import base64, json, os, re, sys, urllib.request
+
           sha, size = sys.argv[1], sys.argv[2]
-          path = 'catalog.json'
-          text = open(path, encoding='utf-8').read()
-          i = text.index('"id": "makhzan-store"')
-          j = text.find('"id": "', i + 10)
+          repo = os.environ["GITHUB_REPOSITORY"]
+          tok = os.environ["GH_TOKEN"]
+          api = "https://api.github.com/repos/%s/contents/catalog.json" % repo
+
+          def call(url, data=None, method="GET"):
+              req = urllib.request.Request(url, data=data, method=method)
+              req.add_header("Authorization", "Bearer " + tok)
+              req.add_header("Accept", "application/vnd.github+json")
+              if data is not None:
+                  req.add_header("Content-Type", "application/json")
+              return json.load(urllib.request.urlopen(req, timeout=120))
+
+          raw = urllib.request.urlopen(
+              "https://raw.githubusercontent.com/%s/main/catalog.json" % repo, timeout=120
+          ).read().decode("utf-8")
+          i = raw.index('"id": "makhzan-store"')
+          j = raw.find('"id": "', i + 10)
           if j == -1:
-              j = len(text)
-          block = text[i:j]
-          block = re.sub(r'"sha256": "[^"]*"', '"sha256": "%s"' % sha, block, count=1)
-          block = re.sub(r'"size_mb": [0-9.]+', '"size_mb": %s' % size, block, count=1)
-          out = text[:i] + block + text[j:]
+              j = len(raw)
+          blk = raw[i:j]
+          blk = re.sub(r'"sha256": "[^"]*"', '"sha256": "%s"' % sha, blk, count=1)
+          blk = re.sub(r'"size_mb": [0-9.]+', '"size_mb": %s' % size, blk, count=1)
+          out = raw[:i] + blk + raw[j:]
           json.loads(out)
-          open(path, 'w', encoding='utf-8').write(out)
-          print('catalog synced:', sha, size)
+          if out == raw:
+              print("catalog already in sync")
+              sys.exit(0)
+          cur = call(api + "?ref=main")
+          body = json.dumps({
+              "message": "chore: sync store APK checksum [skip ci]",
+              "content": base64.b64encode(out.encode("utf-8")).decode("ascii"),
+              "sha": cur["sha"],
+              "branch": "main",
+          }).encode("utf-8")
+          res = call(api, body, "PUT")
+          print("catalog updated in", res["commit"]["sha"][:8])
+          try:
+              call("https://api.github.com/repos/%s/pages/builds" % repo, b"{}", "POST")
+              print("pages rebuild requested")
+          except Exception as exc:
+              print("pages rebuild skipped:", exc)
           PYEOF
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add catalog.json
-          if git diff --cached --quiet; then
-            echo "catalog already in sync"
-          else
-            git commit -m "chore: sync store APK checksum [skip ci]"
-            git push
-            curl -sf -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages/builds" \
-              || echo "warning: pages build request failed; site updates on next push"
-          fi
