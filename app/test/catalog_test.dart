@@ -23,6 +23,48 @@ void main() {
     expect(http.downloadable, isFalse);
   });
 
+  test('v2 schema fields map to name, blurb and description', () {
+    final a = StoreApp.fromJson(<String, dynamic>{
+      'id': 'org.example.app',
+      'name': 'Example',
+      'summary': 'ملخص قصير',
+      'desc': 'وصف كامل',
+      'category': 'tools',
+      'screenshots': <dynamic>['https://x/1.png', ''],
+      'license': 'GPL-3.0',
+      'min_sdk': 21,
+      'updated': '2026-11-20',
+    });
+    expect(a.displayName, 'Example');
+    expect(a.blurb, 'ملخص قصير');
+    expect(a.description, 'وصف كامل');
+    expect(a.screenshots.length, 1);
+    expect(a.minSdk, 21);
+    expect(a.updatedAt, '2026-11-20');
+
+    final ar = StoreApp.fromJson(<String, dynamic>{
+      'id': 'x',
+      'name': 'X',
+      'name_ar': 'إكس',
+      'desc_ar': 'وصف عربي',
+      'desc': 'english',
+    });
+    expect(ar.displayName, 'إكس');
+    expect(ar.description, 'وصف عربي');
+  });
+
+  test('catalog reads categories', () {
+    final cat = Catalog.fromJson(<String, dynamic>{
+      'apps': <dynamic>[],
+      'categories': <dynamic>[
+        <String, dynamic>{'id': 'games', 'name': 'ألعاب'},
+        <String, dynamic>{'id': 'tools', 'name': 'أدوات'},
+      ],
+    });
+    expect(cat.categories.length, 2);
+    expect(cat.categories.first.name, 'ألعاب');
+  });
+
   test('catalog parses apps and skips junk', () {
     final cat = Catalog.fromJson(<String, dynamic>{
       'store': 'مخزن',
