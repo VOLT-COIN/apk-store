@@ -52,4 +52,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: '5f36acb7a1d2abd0638f6ba0bfc28439'
-          command: pages deploy dist --project-name nova-store --branch main
+          command: pages deploy dist --project-name novastore-app --branch main
