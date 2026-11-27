@@ -85,3 +85,41 @@ jobs:
 
             الحزمة: com.eslam.makhzan — يعمل على أندرويد 5.0 وأحدث.
           files: out/*.apk
+
+      - name: Sync catalog checksum
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          APK="out/MakhzanStore-${VERSION}-arm64-v8a.apk"
+          SHA=$(sha256sum "$APK" | awk '{print $1}')
+          SIZE=$(python3 -c "import os,sys;print(round(os.path.getsize(sys.argv[1])/1048576,2))" "$APK")
+          python3 - "$SHA" "$SIZE" <<'PYEOF'
+          import json, re, sys
+          sha, size = sys.argv[1], sys.argv[2]
+          path = 'catalog.json'
+          text = open(path, encoding='utf-8').read()
+          i = text.index('"id": "makhzan-store"')
+          j = text.find('"id": "', i + 10)
+          if j == -1:
+              j = len(text)
+          block = text[i:j]
+          block = re.sub(r'"sha256": "[^"]*"', '"sha256": "%s"' % sha, block, count=1)
+          block = re.sub(r'"size_mb": [0-9.]+', '"size_mb": %s' % size, block, count=1)
+          out = text[:i] + block + text[j:]
+          json.loads(out)
+          open(path, 'w', encoding='utf-8').write(out)
+          print('catalog synced:', sha, size)
+          PYEOF
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add catalog.json
+          if git diff --cached --quiet; then
+            echo "catalog already in sync"
+          else
+            git commit -m "chore: sync store APK checksum [skip ci]"
+            git push
+            curl -sf -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages/builds" \
+              || echo "warning: pages build request failed; site updates on next push"
+          fi
