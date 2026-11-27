@@ -94,6 +94,9 @@ jobs:
           APK="out/MakhzanStore-${VERSION}-arm64-v8a.apk"
           SHA=$(sha256sum "$APK" | awk '{print $1}')
           SIZE=$(python3 -c "import os,sys;print(round(os.path.getsize(sys.argv[1])/1048576,2))" "$APK")
+          # take the newest catalog, so a parallel catalog rebuild is not clobbered
+          git fetch --depth=1 origin main
+          git checkout origin/main -- catalog.json
           python3 - "$SHA" "$SIZE" <<'PYEOF'
           import json, re, sys
           sha, size = sys.argv[1], sys.argv[2]
